@@ -69,9 +69,9 @@ const Logo = () => (
               items={[
                 { label: t('settings.title'), onClick: () => navigate('/settings') },
                 { label: 'login', onClick: () => navigate('/auth') },
-                { label: 'register', onClick: () => navigate('/auth') },
-                { label: t('nav.history'), onClick: () => navigate('/history') },
-                { label: 'Logout', onClick: () => console.log('Logout') },
+                // { label: 'register', onClick: () => navigate('/auth') },
+                // { label: t('nav.history'), onClick: () => navigate('/history') },
+                // { label: 'Logout', onClick: () => console.log('Logout') },
               ]}
             />
           </div>
