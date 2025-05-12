@@ -9,7 +9,16 @@ function Header({ onMenuClick }) {
   const { t } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  
+const Logo = () => (
+  <div className="flex items-center">
+    <img src="/RAG_logo.png" alt="logo" className="h-8 w-8 object-contain hidden md:block" />
+    <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+      RAGvLangChain
+    </span>
+  </div>
+);
+
+
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +31,7 @@ function Header({ onMenuClick }) {
               <Menu size={24} />
             </button>
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-primary">{t('app.name')}</h1>
+              <Logo />
             </div>
           </div>
           
@@ -52,14 +61,17 @@ function Header({ onMenuClick }) {
                 <div className="flex items-center cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                     <User size={18} className="text-gray-600 dark:text-gray-300" />
+                    <div><a href=""></a></div>
                   </div>
                   <ChevronDown size={16} className="ml-1 text-gray-600 dark:text-gray-300" />
                 </div>
               }
               items={[
                 { label: t('settings.title'), onClick: () => navigate('/settings') },
-                { label: t('nav.history'), onClick: () => navigate('/history') },
-                { label: 'Logout', onClick: () => console.log('Logout') },
+                { label: 'login', onClick: () => navigate('/auth') },
+                // { label: 'register', onClick: () => navigate('/auth') },
+                // { label: t('nav.history'), onClick: () => navigate('/history') },
+                // { label: 'Logout', onClick: () => console.log('Logout') },
               ]}
             />
           </div>
