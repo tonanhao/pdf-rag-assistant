@@ -1,0 +1,13 @@
+name: rag-demo
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - fastapi=0.109.2
+  - uvicorn=0.27.1
+  - pip=23.3.1
+  - pip:
+    - python-multipart==0.0.7
+    - python-dotenv==1.0.1
+    - pydantic==2.6.1

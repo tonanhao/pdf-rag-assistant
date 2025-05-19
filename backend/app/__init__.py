@@ -1,39 +1,16 @@
-# backend/app/__init__.py
-import os
-from flask import Flask
-from flask_cors import CORS
-from app.db.models import db
-from app.routes.auth_routes import auth_bp
+# FastAPI app package
+import sys
+from pathlib import Path
 
-def create_app():
-    app = Flask(__name__)
-    
-    # Enable CORS
-    CORS(app, resources={r"/*": {"origins": "*"}})
-    
-    # Configure database
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-        'DATABASE_URL', 
-        'postgresql://postgres:postgres@localhost:5432/rag_app_db'
-    )
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Initialize database
-    db.init_app(app)
-    
-    # Register blueprints
-    app.register_blueprint(auth_bp)
-    
-    # Health check route
-    @app.route('/api/health')
-    def health_check():
-        return {'status': 'OK'}, 200
-    
-    return app
+# Make sure required directories exist
+routes_dir = Path(__file__).parent / "routes"
+routes_dir.mkdir(exist_ok=True)
 
-# For running with Flask CLI
-app = create_app()
+# Create empty __init__.py files in the routes directory if they don't exist
+init_file = routes_dir / "__init__.py"
+if not init_file.exists():
+    with open(init_file, "w") as f:
+        f.write("# Routes package\n")
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+# Make sure the routes directory is in the Python path
+sys.path.append(str(Path(__file__).parent.parent))
