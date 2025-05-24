@@ -93,9 +93,6 @@ const HistoryPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{t('history.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {t('history.description')}
-          </p>
         </div>
         
         {conversations.length > 0 && (
@@ -125,7 +122,7 @@ const HistoryPage = () => {
       <Card>
         <div className="mb-4">
           <Input
-            placeholder={t('history.searchPlaceholder')}
+            placeholder={t('searchPlaceholder...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             icon={<Search size={18} />}
@@ -155,7 +152,7 @@ const HistoryPage = () => {
                     <MessageSquare size={18} className="mr-3 text-gray-500" />
                     <div>
                       <h3 className="font-medium">{conversation.title}</h3>
-                      <p className="text-sm text-gray-500">{conversation.lastMessage}</p>
+                      <p className="text-sm text-gray-500 text-justify line-clamp-2 max-w-xl">{conversation.lastMessage}</p>
                     </div>
                   </div>
                   <div className="flex items-center">
@@ -177,11 +174,12 @@ const HistoryPage = () => {
                     <Button
                       variant="destructive"
                       size="sm"
-                      icon={<Trash2 size={16} />}
                       onClick={(e) => handleDeleteConversation(e, conversation.id)}
                       title="Delete conversation"
                       className="bg-red-600 hover:bg-red-700 text-white"
-                    />
+                    >
+                      <Trash2 size={16} />
+                    </Button>
                   </div>
                 </div>
               ))
