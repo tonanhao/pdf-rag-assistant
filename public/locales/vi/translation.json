@@ -14,7 +14,7 @@
       "title": "Tổng quan",
       "totalDocuments": "Tổng số tài liệu",
       "totalQueries": "Tổng số truy vấn",
-      "avgResponseTime": "Thời gian phản hồi TB"
+      "avgResponseTime": "Thời gian phản hồi trung bình"
     },
     "import": {
       "title": "Nhập tài liệu",
@@ -29,7 +29,10 @@
       "placeholder": "Đặt câu hỏi về tài liệu của bạn...",
       "send": "Gửi",
       "sources": "Nguồn",
-      "loading": "Đang suy nghĩ..."
+      "loading": "Đang suy nghĩ...",
+      "newChat": "Cuộc trò chuyện mới",
+      "askQuestions": "Đặt câu hỏi về tài liệu của bạn",
+      "startConversation": "Bắt đầu cuộc trò chuyện bằng cách tải lên tài liệu và đặt câu hỏi về chúng"
     },
     "history": {
       "title": "Lịch sử truy vấn",
@@ -55,7 +58,9 @@
       "confirmClearData": "Bạn có chắc chắn muốn xóa tất cả dữ liệu? Hành động này không thể hoàn tác.",
       "dataCleared": "Đã xóa tất cả dữ liệu thành công",
       "saved": "Đã lưu cài đặt thành công",
-      "dangerZone": "Khu vực nguy hiểm"
+      "dangerZone": "Khu vực nguy hiểm",
+      "darkMode": "Chế độ tối",
+      "lightMode": "Chế độ sáng"
     },
     "common": {
       "loading": "Đang tải...",
@@ -66,6 +71,26 @@
       "delete": "Xóa",
       "edit": "Sửa",
       "view": "Xem",
-      "search": "Tìm kiếm"
+      "search": "Tìm kiếm",
+      "dashboard": "Bảng điều khiển",
+      "documents": "Tài liệu",
+      "conversations": "Cuộc hội thoại",
+      "you": "Bạn",
+      "ai": "AI",
+      "invalidFormat": "Một số tệp có định dạng không hợp lệ",
+      "uploadedSuccess": "{{name}} đã được tải lên thành công!"
+    },
+    "documents": {
+      "upload": "Tải lên tài liệu",
+      "delete": "Xóa",
+      "noDocuments": "Không tìm thấy tài liệu nào",
+      "uploadedFiles": "Tệp đã tải lên"
+    },
+    "conversations": {
+      "newChat": "Cuộc trò chuyện mới",
+      "delete": "Xóa cuộc hội thoại",
+      "noConversations": "Không tìm thấy cuộc hội thoại nào",
+      "sources": "Nguồn",
+      "view": "Xem"
     }
-  }
+}
