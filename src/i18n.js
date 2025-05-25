@@ -6,6 +6,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Import fallback translations directly
 import enTranslation from '../public/locales/en/translation.json';
+import viTranslation from '../public/locales/vi/translation.json';
 
 i18n
   .use(Backend)
@@ -15,6 +16,9 @@ i18n
     resources: {
       en: {
         translation: enTranslation
+      },
+      vi: {
+        translation: viTranslation
       }
     },
     fallbackLng: 'en',

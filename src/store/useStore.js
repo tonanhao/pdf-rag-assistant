@@ -8,6 +8,7 @@ import {
   deleteConversation,
   deleteDocument
 } from '../api/apiClient';
+import i18n from '../i18n';
 
 // Helper to check if a conversation is empty/worth saving
 const isConversationEmpty = (conversation) => {
@@ -35,6 +36,9 @@ const useStore = create((set, get) => ({
   // Loading states
   isLoading: false,
   error: null,
+  
+  // Language settings
+  language: localStorage.getItem('i18nextLng') || 'en',
   
   // Actions
   setStats: (stats) => set({ stats }),
@@ -214,6 +218,13 @@ const useStore = create((set, get) => ({
       console.error('Error deleting conversation:', error);
       set({ error: 'Failed to delete conversation', isLoading: false });
     }
+  },
+
+  // Language actions
+  setLanguage: (lang) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('i18nextLng', lang);
+    set({ language: lang });
   }
 }));
 
