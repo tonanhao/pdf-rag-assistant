@@ -5,7 +5,8 @@ import {
   getConversation, 
   createConversation, 
   updateConversation, 
-  deleteConversation 
+  deleteConversation,
+  deleteDocument
 } from '../api/apiClient';
 
 // Helper to check if a conversation is empty/worth saving
@@ -38,6 +39,17 @@ const useStore = create((set, get) => ({
   // Actions
   setStats: (stats) => set({ stats }),
   setDocuments: (documents) => set({ documents }),
+  fetchDocuments: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // Giả sử backend có endpoint /documents trả về danh sách file
+      const response = await fetch('http://localhost:8001/documents');
+      const docs = await response.json();
+      set({ documents: docs, isLoading: false });
+    } catch {
+      set({ error: 'Failed to fetch documents', isLoading: false });
+    }
+  },
   addDocument: (document) => set((state) => ({ 
     documents: [...state.documents, document],
     stats: { 
@@ -45,13 +57,22 @@ const useStore = create((set, get) => ({
       documentCount: state.stats.documentCount + 1 
     }
   })),
-  removeDocument: (id) => set((state) => ({ 
-    documents: state.documents.filter(doc => doc.id !== id),
-    stats: { 
-      ...state.stats, 
-      documentCount: state.stats.documentCount - 1 
+  removeDocument: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await deleteDocument(id);
+      set((state) => ({ 
+        documents: state.documents.filter(doc => doc.id !== id),
+        stats: { 
+          ...state.stats, 
+          documentCount: state.stats.documentCount - 1 
+        },
+        isLoading: false
+      }));
+    } catch {
+      set({ error: 'Failed to delete document', isLoading: false });
     }
-  })),
+  },
   
   // Fetch conversations from API
   fetchConversations: async () => {

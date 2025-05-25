@@ -1,7 +1,8 @@
 // src/pages/ImportPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Card from '../components/common/Card';
+import useStore from '../store/useStore';
 
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -11,6 +12,17 @@ const ImportPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(t('noPdfUploaded'));
   const [isDragOver, setIsDragOver] = useState(false);
+  const {
+    documents,
+    fetchDocuments,
+    removeDocument,
+    isLoading: storeLoading,
+    error: storeError
+  } = useStore();
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -68,7 +80,7 @@ const ImportPage = () => {
       let result;
       try {
         result = JSON.parse(text);
-      } catch (e) {
+      } catch {
         console.error('Failed to parse JSON:', text);
         throw new Error('Invalid response format from server');
       }
@@ -80,6 +92,7 @@ const ImportPage = () => {
         if (fileInput) {
           fileInput.value = '';
         }
+        fetchDocuments();
       } else {
         setStatusMessage(`Error: ${result.detail || 'Failed to upload PDF.'}`);
       }
@@ -256,6 +269,61 @@ const ImportPage = () => {
                   </div>
                 </div>
               )}
+
+              {/* File Management Section */}
+              <div className="mt-10">
+                <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Your Imported Files</h2>
+                {storeLoading ? (
+                  <div className="text-center text-gray-500 py-8">Loading documents...</div>
+                ) : storeError ? (
+                  <div className="text-center text-red-500 py-8">{storeError}</div>
+                ) : documents && documents.length > 0 ? (
+                  <ul className="space-y-3">
+                    {documents.map((doc) => (
+                      <li
+                        key={doc.id}
+                        className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <svg className="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                          </svg>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{doc.name || doc.filename || doc.id}</span>
+                          <span className="text-xs text-gray-500">{doc.size ? `${(doc.size/1024/1024).toFixed(2)} MB` : ''}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {/* Nút xem file nếu muốn */}
+                          {doc.id && (
+                            <a
+                              href={`http://localhost:8001/documents/${doc.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-700 transition-colors"
+                              title="View file"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </a>
+                          )}
+                          {/* Nút xóa */}
+                          <button
+                            onClick={() => removeDocument(doc.id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            title="Delete file"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center text-gray-400 py-8">No files imported yet.</div>
+                )}
+              </div>
             </div>
           </Card>
 

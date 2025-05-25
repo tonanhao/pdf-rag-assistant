@@ -16,14 +16,14 @@ import string
 from app.db.models import db, User, Profile, ResetToken
 
 # JWT Configuration
-JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-here')  # Should be in env
+JWT_SECRET = os.environ.get('JWT_SECRET', 'JWT_SECRET_KEY')  # Should be in env
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION = 24  # hours
 
 # Email Service Configuration (should be in env)
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USER = os.environ.get('EMAIL_USER', 'your-email@gmail.com')
+EMAIL_USER = os.environ.get('EMAIL_USER', 'demotestmot@gmail.com')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'app-password')
 EMAIL_FROM = os.environ.get('EMAIL_FROM', 'no-reply@ragvlangchain.com')
 
