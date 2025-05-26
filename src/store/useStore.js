@@ -82,11 +82,28 @@ const useStore = create((set, get) => ({
   fetchConversations: async () => {
     set({ isLoading: true, error: null });
     try {
+      console.log('Store: Fetching conversations from API...');
       const conversations = await getConversations();
+      console.log('Store: Received conversations:', conversations.length, 'items');
       set({ conversations, isLoading: false });
     } catch (error) {
-      console.error('Error fetching conversations:', error);
-      set({ error: 'Failed to fetch conversations', isLoading: false });
+      console.error('Store: Error fetching conversations:', error);
+      let errorMessage = 'Failed to fetch conversations';
+      
+      if (error.code === 'ECONNREFUSED') {
+        errorMessage = 'Cannot connect to backend server. Please ensure the backend is running on port 8001.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Authentication required. Please log in again.';
+        // Clear invalid token
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied. You don\'t have permission to view these conversations.';
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      }
+      
+      set({ error: errorMessage, isLoading: false });
     }
   },
   
@@ -152,13 +169,18 @@ const useStore = create((set, get) => ({
   
   // Add message to current conversation
   addMessage: async (message) => {
-    if (!get().currentConversation) return;
+    if (!get().currentConversation) {
+      console.log('Store: No current conversation, cannot add message');
+      return;
+    }
     
     // Skip empty messages
     if (!message.content || message.content.trim() === '') {
-      console.log('Skipping empty message');
+      console.log('Store: Skipping empty message');
       return;
     }
+    
+    console.log('Store: Adding message to conversation:', get().currentConversation.id);
     
     const updatedConversation = {
       ...get().currentConversation,
@@ -218,6 +240,21 @@ const useStore = create((set, get) => ({
       console.error('Error deleting conversation:', error);
       set({ error: 'Failed to delete conversation', isLoading: false });
     }
+  },
+
+  // Clear user-specific data (call when user logs out)
+  clearUserData: () => {
+    set({
+      conversations: [],
+      currentConversation: null,
+      documents: [],
+      stats: {
+        documentCount: 0,
+        queryCount: 0,
+        avgResponseTime: 0,
+      },
+      error: null
+    });
   },
 
   // Language actions

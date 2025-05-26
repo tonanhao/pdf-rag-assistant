@@ -107,6 +107,13 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    
+    // Clear user-specific data from store
+    const clearUserData = window.useStore?.getState?.()?.clearUserData;
+    if (clearUserData) {
+      clearUserData();
+    }
+    
     return { success: true };
   };
 

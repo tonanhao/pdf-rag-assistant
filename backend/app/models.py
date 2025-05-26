@@ -27,6 +27,7 @@ class Conversation(BaseModel):
     timestamp: Union[datetime, str]
     messages: List[Message]
     pdf_file: Optional[str] = None  # Path to the PDF file if attached
+    user_id: Optional[str] = None  # User ID for user-specific conversations
     
     @validator('timestamp', pre=True)
     def parse_timestamp(cls, value):

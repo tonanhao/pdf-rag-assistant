@@ -14,11 +14,14 @@ const ChatPage = () => {
   useEffect(() => {
     // Create a new conversation if none exists or if current one is null
     if (!store.currentConversation) {
-      store.setCurrentConversation({
-        id: Date.now(),
+      const newConversation = {
+        id: Date.now().toString(), // Ensure ID is string for consistency
         title: 'New Conversation',
-        messages: []
-      });
+        messages: [],
+        lastMessage: '',
+        timestamp: new Date().toISOString()
+      };
+      store.setCurrentConversation(newConversation);
     }
   }, [store.currentConversation, store.setCurrentConversation]);
 
@@ -29,7 +32,7 @@ const ChatPage = () => {
     }
 
     const userMessage = {
-      id: Date.now(),
+      id: Date.now().toString(),
       role: 'user',
       content: messageContent,
       timestamp: new Date().toISOString()
@@ -51,7 +54,7 @@ const ChatPage = () => {
 
       if (response.ok) {
         const assistantMessage = {
-          id: Date.now() + 1, // Ensure unique ID
+          id: (Date.now() + 1).toString(), // Ensure unique ID and string format
           role: 'assistant',
           content: result.answer,
           timestamp: new Date().toISOString(),
@@ -61,7 +64,7 @@ const ChatPage = () => {
       } else {
         // Display error to the user, e.g., by adding an error message to the chat
         const errorMessage = {
-          id: Date.now() + 1,
+          id: (Date.now() + 1).toString(),
           role: 'system', // Or 'error' if you have specific styling
           content: `Error: ${result.detail || 'Failed to get answer.'} (Status: ${response.status})`,
           timestamp: new Date().toISOString(),
@@ -73,7 +76,7 @@ const ChatPage = () => {
     } catch (error) {
       console.error('Network error:', error);
       const networkErrorMessage = {
-        id: Date.now() + 1,
+        id: (Date.now() + 1).toString(),
         role: 'system',
         content: `Network Error: ${error.message || 'Could not connect to server.'}`,
         timestamp: new Date().toISOString(),

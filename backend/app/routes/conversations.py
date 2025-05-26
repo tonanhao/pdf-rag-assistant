@@ -10,6 +10,7 @@ import shutil
 
 from ..models import Conversation, ConversationCreate, ConversationUpdate, Message
 from ..config import BASE_DIR, UPLOAD_DIR, CONVERSATION_DIR
+from ..middleware.fastapi_auth import get_current_user
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
@@ -25,8 +26,8 @@ def is_conversation_empty(conversation):
         for msg in conversation.get("messages", [])
     )
 
-# Helper function to load conversations
-def load_conversations():
+# Helper function to load conversations for a specific user
+def load_conversations(user_id: str = None):
     conversations = []
     for file_path in CONVERSATION_DIR.glob("*.json"):
         try:
@@ -35,6 +36,10 @@ def load_conversations():
                 
                 # Skip empty conversations
                 if is_conversation_empty(conversation) and not conversation.get("pdf_file"):
+                    continue
+                
+                # Filter by user_id if provided
+                if user_id and conversation.get("user_id") != user_id:
                     continue
                 
                 # Ensure message IDs are strings for compatibility
@@ -49,17 +54,22 @@ def load_conversations():
     return conversations
 
 @router.get("/", response_model=List[Conversation])
-async def get_conversations():
-    return load_conversations()
+async def get_conversations(current_user: dict = Depends(get_current_user)):
+    user_id = current_user["user_id"]
+    return load_conversations(user_id)
 
 @router.get("/{conversation_id}", response_model=Conversation)
-async def get_conversation(conversation_id: str):
+async def get_conversation(conversation_id: str, current_user: dict = Depends(get_current_user)):
     file_path = CONVERSATION_DIR / f"{conversation_id}.json"
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Conversation not found")
     
     with open(file_path, "r") as f:
         conversation = json.load(f)
+        
+        # Check if user owns this conversation
+        if conversation.get("user_id") != current_user["user_id"]:
+            raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
         
         # Ensure message IDs are strings for compatibility
         if "messages" in conversation and conversation["messages"]:
@@ -73,7 +83,8 @@ async def get_conversation(conversation_id: str):
 async def create_conversation(
     title: str = Form(...),
     last_message: str = Form(...),
-    pdf_file: Optional[UploadFile] = File(None)
+    pdf_file: Optional[UploadFile] = File(None),
+    current_user: dict = Depends(get_current_user)
 ):
     # Skip empty conversations without PDF
     if not pdf_file and not title.strip() and not last_message.strip():
@@ -88,7 +99,8 @@ async def create_conversation(
         "lastMessage": last_message,
         "timestamp": timestamp,
         "messages": [],
-        "pdf_file": None
+        "pdf_file": None,
+        "user_id": current_user["user_id"]
     }
     
     # Handle PDF file upload if present
@@ -112,7 +124,8 @@ async def create_conversation(
 @router.put("/{conversation_id}")
 async def update_conversation(
     conversation_id: str,
-    update_data: Dict[str, Any] = Body(...)
+    update_data: Dict[str, Any] = Body(...),
+    current_user: dict = Depends(get_current_user)
 ):
     file_path = CONVERSATION_DIR / f"{conversation_id}.json"
     
@@ -128,7 +141,8 @@ async def update_conversation(
             "lastMessage": update_data.get("lastMessage", ""),
             "timestamp": update_data.get("timestamp", timestamp),
             "messages": update_data.get("messages", []),
-            "pdf_file": update_data.get("pdf_file", None)
+            "pdf_file": update_data.get("pdf_file", None),
+            "user_id": current_user["user_id"]
         }
         
         # Check if the new conversation is empty without PDF
@@ -138,6 +152,10 @@ async def update_conversation(
         # Load existing conversation
         with open(file_path, "r") as f:
             conversation = json.load(f)
+            
+        # Check if user owns this conversation
+        if conversation.get("user_id") != current_user["user_id"]:
+            raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
     
     # Update fields
     if "title" in update_data:
@@ -166,7 +184,7 @@ async def update_conversation(
     return conversation
 
 @router.delete("/{conversation_id}")
-async def delete_conversation(conversation_id: str):
+async def delete_conversation(conversation_id: str, current_user: dict = Depends(get_current_user)):
     file_path = CONVERSATION_DIR / f"{conversation_id}.json"
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Conversation not found")
@@ -174,6 +192,10 @@ async def delete_conversation(conversation_id: str):
     # Load conversation to check if there's an associated PDF
     with open(file_path, "r") as f:
         conversation = json.load(f)
+        
+    # Check if user owns this conversation
+    if conversation.get("user_id") != current_user["user_id"]:
+        raise HTTPException(status_code=403, detail="Access denied: You don't own this conversation")
     
     # Delete the PDF file if it exists
     if conversation.get("pdf_file"):

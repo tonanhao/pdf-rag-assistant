@@ -33,7 +33,10 @@ const HistoryPage = () => {
 
   // Fetch conversations when the component mounts
   useEffect(() => {
-    fetchConversations();
+    console.log('HistoryPage: Fetching conversations...');
+    fetchConversations().catch(err => {
+      console.error('HistoryPage: Failed to fetch conversations:', err);
+    });
   }, [fetchConversations]);
 
   useEffect(() => {
@@ -155,7 +158,18 @@ const HistoryPage = () => {
           </div>
         ) : error ? (
           <div className="py-6 text-center">
-            <p className="text-red-500">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+              <AlertCircle className="mx-auto text-red-500 mb-2" size={24} />
+              <p className="text-red-700 font-medium mb-2">Unable to load chat history</p>
+              <p className="text-red-600 text-sm">{error}</p>
+              <Button 
+                onClick={() => fetchConversations()} 
+                variant="outline" 
+                className="mt-3"
+              >
+                Retry
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-2">
