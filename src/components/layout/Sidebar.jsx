@@ -46,7 +46,7 @@ function Sidebar({ open, onClose }) {
 
   const links = [
     {
-      path: "/",
+      path: "/dashboard",
       label: t("nav.dashboard"),
       icon: <LayoutDashboard size={20} />,
     },

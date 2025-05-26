@@ -4,9 +4,9 @@ import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// Import fallback translations directly
-import enTranslation from '../public/locales/en/translation.json';
-import viTranslation from '../public/locales/vi/translation.json';
+// Import fallback translations using URL strategy (Vite compatible)
+const enTranslation = await import('/locales/en/translation.json?url').then(module => fetch(module.default)).then(res => res.json());
+const viTranslation = await import('/locales/vi/translation.json?url').then(module => fetch(module.default)).then(res => res.json());
 
 i18n
   .use(Backend)

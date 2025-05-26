@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2, ArrowRight, KeyRound, Loader2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContextNoNavigate';
 
 // Logo Component
 const Logo = () => (
@@ -31,7 +33,7 @@ const Input = ({ label, type, value, onChange, error, placeholder, icon: Icon })
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+          className={`w-full ${Icon ? 'pl-10' : 'pl-3'} pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-900 ${
             error ? 'border-red-500' : 'border-gray-300'
           }`}
         />
@@ -157,6 +159,8 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const navigate = useNavigate(); // Hook navigate từ react-router
+  const { login, register: registerUser } = useAuth(); // Sử dụng context auth
 
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
@@ -229,10 +233,26 @@ const AuthPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await new Promise(r => setTimeout(r, 1000));
-      setSuccess('Đăng nhập thành công!');
-    } catch {
-      setError('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      console.log('Đang gọi login từ AuthContext...');
+      const result = await login(loginEmail, loginPassword);
+      console.log('Kết quả đăng nhập từ context:', result);
+      console.log('Token hiện tại:', localStorage.getItem('token'));
+      
+      if (result.success) {
+        setSuccess('Đăng nhập thành công!');
+        
+        console.log('Chuẩn bị chuyển hướng...');
+        // Tăng thời gian chờ để đảm bảo trạng thái đã được cập nhật
+        setTimeout(() => {
+          console.log('Chuyển hướng đến dashboard...');
+          navigate('/dashboard', { replace: true });
+        }, 1000);
+      } else {
+        setError(result.error || 'Đăng nhập thất bại');
+      }
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      setError(error.detail || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setIsLoading(false);
     }
@@ -257,10 +277,29 @@ const AuthPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await new Promise(r => setTimeout(r, 1000));
-      setSuccess('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
-    } catch {
-      setError('Đăng ký thất bại. Vui lòng thử lại sau.');
+      console.log('Đang gọi registerUser từ AuthContext...');
+      const result = await registerUser({
+        full_name: registerName,
+        email: registerEmail,
+        password: registerPassword,
+        confirm_password: registerConfirmPassword
+      });
+      
+      console.log('Kết quả đăng ký từ context:', result);
+      
+      if (result.success) {
+        setSuccess('Đăng ký thành công!');
+        
+        // Chuyển hướng đến dashboard sau khi đăng ký thành công
+        setTimeout(() => {
+          console.log('Chuyển hướng đến dashboard sau đăng ký...');
+          navigate('/dashboard', { replace: true });
+        }, 1000);
+      } else {
+        setError(result.error || 'Đăng ký thất bại');
+      }
+    } catch (error) {
+      setError(error.detail || 'Đăng ký thất bại. Vui lòng thử lại sau.');
     } finally {
       setIsLoading(false);
     }
@@ -277,10 +316,12 @@ const AuthPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await new Promise(r => setTimeout(r, 1000));
+      // Gọi API quên mật khẩu
+      const { authApi } = await import('../../api/authApi');
+      await authApi.forgotPassword(forgotEmail);
       setSuccess('Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn.');
-    } catch {
-      setError('Không thể gửi yêu cầu. Vui lòng thử lại sau.');
+    } catch (error) {
+      setError(error.detail || 'Không thể gửi yêu cầu. Vui lòng thử lại sau.');
     } finally {
       setIsLoading(false);
     }

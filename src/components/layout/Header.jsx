@@ -1,13 +1,15 @@
 // src/components/layout/Header.jsx
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, Bell, User, ChevronDown } from 'lucide-react';
+import { Menu, Bell, User, ChevronDown, LogOut, Settings } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContextNoNavigate';
 import Dropdown from '../common/Dropdown';
 
 function Header({ onMenuClick }) {
   const { t } = useTranslation();
   const { isDark, toggleTheme } = useTheme();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 const Logo = () => (
   <div className="flex items-center">
@@ -61,17 +63,24 @@ const Logo = () => (
                 <div className="flex items-center cursor-pointer">
                   <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                     <User size={18} className="text-gray-600 dark:text-gray-300" />
-                    <div><a href=""></a></div>
                   </div>
+                  {isAuthenticated && user && (
+                    <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:inline-block">
+                      {user.full_name || user.email}
+                    </span>
+                  )}
                   <ChevronDown size={16} className="ml-1 text-gray-600 dark:text-gray-300" />
                 </div>
               }
-              items={[
+              items={isAuthenticated ? [
                 { label: t('settings.title'), onClick: () => navigate('/settings') },
-                { label: 'login', onClick: () => navigate('/auth') },
-                // { label: 'register', onClick: () => navigate('/auth') },
-                // { label: t('nav.history'), onClick: () => navigate('/history') },
-                // { label: 'Logout', onClick: () => console.log('Logout') },
+                { label: t('nav.history'), onClick: () => navigate('/history') },
+                { label: 'Đăng xuất', onClick: () => {
+                  logout();
+                  navigate('/auth', { replace: true });
+                }},
+              ] : [
+                { label: 'Đăng nhập', onClick: () => navigate('/auth') },
               ]}
             />
           </div>
