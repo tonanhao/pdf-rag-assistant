@@ -1,3 +1,6 @@
+# Storage Server Dependencies (Port 8001)
+# Install: pip install -r requirements.txt
+
 fastapi==0.109.2
 uvicorn==0.27.1
 python-multipart==0.0.7

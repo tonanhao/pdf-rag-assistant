@@ -8,8 +8,7 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 const ChatPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   // isPdfReady prop is assumed true for now, or handled by routing/global state
-  // const { currentConversation, setCurrentConversation, addMessage } = useStore();
-  const store = useStore(); // Get the whole store instance
+  const store = useStore();
 
   useEffect(() => {
     // Create a new conversation if none exists or if current one is null
